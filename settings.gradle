@@ -1,4 +1,4 @@
 rootProject.name = 'spark-template'
 include 'module-core'
-include 'service-batch'
+include 'service-example'
 

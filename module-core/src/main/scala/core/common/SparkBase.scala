@@ -1,29 +1,25 @@
 package core.common
 
+import core.util.SparkUtil.buildSparkSession
 import org.apache.log4j.LogManager
 import org.apache.spark.sql.SparkSession
 
-trait SparkBase {
-    val logger = LogManager.getRootLogger
-    var session: SparkSession = null
+import scala.util.Using
 
-    def buildSparkSession(): SparkSession = {
-        var sessionBuilder = SparkSession.builder().enableHiveSupport()
-        if (Env.isLocalMode)
-            sessionBuilder = sessionBuilder.master("local[*]")
-        sessionBuilder.getOrCreate()
-    }
+trait SparkBase {
+    val logger = LogManager.getLogger(this.getClass.getName)
+    var session: SparkSession = null
 
     def driver(session: SparkSession, args: Array[String]): Unit
 
     def main(args: Array[String]): Unit = {
-        session = buildSparkSession()
-        try {
-            driver(session, args)
-        } catch {
-            case t: Throwable =>
-                logger.error("Application failed due to", t)
-                session.stop()
+        Using(buildSparkSession()) { session =>
+            try {
+                driver(session, args)
+            } catch {
+                case t: Throwable =>
+                    logger.error("Application failed due to", t)
+            }
         }
     }
 }

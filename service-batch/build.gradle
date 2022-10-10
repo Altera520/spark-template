@@ -1,8 +1,0 @@
-def versionValue = file("VERSION").text.trim()
-version "${versionValue}"
-
-dependencies {
-    // shared
-    implementation project(path: ':module-core')
-}
-

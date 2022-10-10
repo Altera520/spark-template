@@ -1,20 +1,16 @@
 buildscript {
     ext {
         gradleShadowPluginVersion = '7.1.2'
-        gradleAvroPluginVersion = '1.2.0'
     }
 
     repositories {
         maven {
             url "https://plugins.gradle.org/m2/"
         }
-//        mavenCentral()
-//        gradlePluginPortal()
     }
 
     dependencies {
         classpath "gradle.plugin.com.github.johnrengelman:shadow:${gradleShadowPluginVersion}"
-//        classpath "com.github.davidmc24.gradle.plugin:gradle-avro-plugin:${gradleAvroPluginVersion}"
     }
 }
 
@@ -23,7 +19,6 @@ allprojects {
     apply plugin: 'java'
     apply plugin: 'java-library'
     apply plugin: 'scala'
-    apply plugin: 'com.github.johnrengelman.shadow'
 
     repositories {
         mavenCentral()
@@ -49,10 +44,12 @@ allprojects {
 
         // util
         pureconfigVersion = "0.17.1"
+        dbcpVersion = "2.9.0"
+        commonLangVersion = "3.12.0"
     }
 
     dependencies {
-        implementation("org.apache.commons:commons-lang3:3.12.0")
+        implementation("org.apache.commons:commons-lang3:${commonLangVersion}")
         implementation("com.github.pureconfig:pureconfig_${scalaVerisonWithoutPatch}:${pureconfigVersion}")
         implementation("org.scala-lang:scala-library:${scalaVersion}")
 

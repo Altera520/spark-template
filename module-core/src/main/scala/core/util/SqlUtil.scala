@@ -1,16 +1,19 @@
 package core.util
 
-import core.common.Config
+import core.common.Env
 import core.model.Conf
 import org.apache.commons.dbcp2.BasicDataSource
+import pureconfig.generic.auto._
 
 import java.sql.ResultSet
 import scala.collection.mutable.ListBuffer
 import scala.io.Source
 import scala.util.Using
 
-object DBCP extends Config[Conf] {
+object DBCP {
     private val ds = new BasicDataSource
+    implicit val hint = Env.buildConfigHint[Conf]()
+    val conf = Env.getConfigOrThrow[Conf]()
 
     ds.setDriverClassName(conf.dbDriverClassName)
     ds.setUrl(conf.dbUrl)
