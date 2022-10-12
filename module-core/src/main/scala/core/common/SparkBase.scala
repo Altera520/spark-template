@@ -1,24 +1,27 @@
 package core.common
 
 import core.util.SparkUtil.buildSparkSession
-import org.apache.log4j.LogManager
+import core.util.TimeUtil
 import org.apache.spark.sql.SparkSession
+import org.slf4j.LoggerFactory
 
 import scala.util.Using
 
 trait SparkBase {
-    val logger = LogManager.getLogger(this.getClass.getName)
+    val logger = LoggerFactory.getLogger(this.getClass)
     var session: SparkSession = null
 
     def driver(session: SparkSession, args: Array[String]): Unit
 
     def main(args: Array[String]): Unit = {
         Using(buildSparkSession()) { session =>
-            try {
-                driver(session, args)
-            } catch {
-                case t: Throwable =>
-                    logger.error("Application failed due to", t)
+            TimeUtil.watchTime {
+                try {
+                    driver(session, args)
+                } catch {
+                    case t: Throwable =>
+                        logger.error("Application failed due to", t)
+                }
             }
         }
     }

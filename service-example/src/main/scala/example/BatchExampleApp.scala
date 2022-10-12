@@ -11,7 +11,7 @@ object BatchExampleApp extends SparkBase {
             s"""
                |SELECT col1
                |     , col2
-               |  FROM
+               |  FROM $tableName
                | WHERE p_dt = '$partitionDate'
                |""".stripMargin)
     }
@@ -20,8 +20,8 @@ object BatchExampleApp extends SparkBase {
         import df.sparkSession.implicits._
 
         df.select(
-            $"col1" + lit(1),
-            $"col2" + lit(1)
+            $"col1" + lit(1) as "col1",
+            $"col2" + lit(1) as "col2"
         )
     }
 

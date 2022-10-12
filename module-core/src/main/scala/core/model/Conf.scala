@@ -1,7 +1,7 @@
 package core.model
 
-case class Conf(dbDriverClassName: String,
-                dbUrl: String,
+case class Conf(dbUrl: String,
+                dbDriverClassName: String,
                 dbUsername: String,
                 dbPassword: String,
                 dsMaxTotal: Int,

@@ -5,6 +5,15 @@ import java.time.{Instant, LocalDate, LocalDateTime, ZoneOffset}
 
 object TimeUtil {
 
+    def watchTime[T](block: => T): T = {
+        val start = System.currentTimeMillis()
+        val res = block
+        val end = System.currentTimeMillis()
+        val elapsed = (end - start) / 1000
+        println(s"[Elapsed time]: $elapsed sec")
+        res
+    }
+
     /**
      * @param partition 'yyyyMMdd' formatted String
      */

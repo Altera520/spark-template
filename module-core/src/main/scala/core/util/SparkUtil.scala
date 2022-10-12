@@ -24,8 +24,11 @@ object SparkUtil {
          * 테이블명으로부터 hdfs상의 hive location 반환
          * @return
          */
-        def convertHivePath() = {
-            ""
+        def toHivePath() = {
+            val Array(schemaName, tableName) =
+                if(str.indexOf(".") > 0) str.split("\\.")
+                else Array("default", str)
+            s"/user/hive/warehouse/$schemaName.db/$tableName"
         }
     }
 }

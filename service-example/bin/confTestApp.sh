@@ -9,7 +9,7 @@ source ./spark-env.sh
 # ================================================= #
 # local | dev | prd
 APP_MODE=${MODE:-prd}
-MAIN_CLASS=""
+MAIN_CLASS="example.ConfTestApp"
 APP_NAME=${APP_NAME:-$MAIN_CLASS}
 DEPLOY_MODE=client
 CONFIG_FILE="service-example.conf"
