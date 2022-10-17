@@ -1,7 +1,7 @@
 package core.util
 
 import core.common.Env
-import core.model.Conf
+import core.entity.Conf
 import org.apache.commons.dbcp2.BasicDataSource
 import pureconfig.generic.auto._
 

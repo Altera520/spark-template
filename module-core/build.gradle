@@ -1,6 +1,7 @@
 dependencies {
     api "org.apache.commons:commons-dbcp2:${dbcpVersion}"
     api group: 'mysql', name: 'mysql-connector-java', version: '8.0.30'
+    api group: 'org.apache.avro', name: 'avro', version: "${avroVersion}"
 
     // logging
     api group: 'org.apache.logging.log4j', name: 'log4j-core', version: "${log4jVersion}"
@@ -13,4 +14,5 @@ dependencies {
     compileOnlyApi group: 'org.apache.spark', name: "spark-sql_${scalaVerisonWithoutPatch}", version: "${sparkVersion}"
     compileOnlyApi group: 'org.apache.spark', name: "spark-hive_${scalaVerisonWithoutPatch}", version: "${sparkVersion}"
     compileOnlyApi group: 'org.apache.spark', name: "spark-streaming_${scalaVerisonWithoutPatch}", version: "${sparkVersion}"
+    api group: 'org.apache.spark', name: "spark-sql-kafka-0-10_${scalaVerisonWithoutPatch}", version: "${sparkVersion}"
 }

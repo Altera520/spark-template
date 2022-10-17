@@ -9,7 +9,8 @@ source ./spark-env.sh
 # ================================================= #
 # local | dev | prd
 APP_MODE=${MODE:-prd}
-MAIN_CLASS=""
+JAR_NAME=service-example-0.0.1-SNAPSHOT-all.jar
+MAIN_CLASS="example.BatchExampleApp"
 APP_NAME=${APP_NAME:-$MAIN_CLASS}
 DEPLOY_MODE=client
 CONFIG_FILE="service-example.conf"
@@ -29,7 +30,6 @@ ${GC_OPT}
 $(config_opt $DEPLOY_MODE $CONFIG_FILE)
 ${REFERENCE_CONF}
 "
-
 
 # yarn resources
 # ================================================= #
@@ -51,8 +51,8 @@ ${SPARK_HOME}/bin/spark-submit \
  --executor-cores ${EXECUTOR_CORE} \
  --executor-memory ${EXECUTOR_MEM} \
  --conf "spark.driver.extraJavaOptions=$(join_by ' ' $OPTS)" \
- --conf "spark.executor.extraJavaOptions=$(join_by ' ' $OPTS)" \
- --files $(join_by ',' $FILES) \
- --jars $(join_by ',' $JARS) \
+  --conf "spark.executor.extraJavaOptions=$(join_by ' ' $OPTS)" \
+ --files $(join_by ',' . $FILES) \
+ --jars $(join_by ',' . $JARS) \
  --class ${MAIN_CLASS} $LIB/$JAR_NAME $@
 

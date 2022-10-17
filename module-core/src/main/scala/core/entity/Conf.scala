@@ -1,4 +1,4 @@
-package core.model
+package core.entity
 
 case class Conf(dbUrl: String,
                 dbDriverClassName: String,

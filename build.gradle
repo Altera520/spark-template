@@ -1,6 +1,7 @@
 buildscript {
     ext {
         gradleShadowPluginVersion = '7.1.2'
+        gradleAvroPluginVersion = '0.99.99'
     }
 
     repositories {
@@ -11,6 +12,7 @@ buildscript {
 
     dependencies {
         classpath "gradle.plugin.com.github.johnrengelman:shadow:${gradleShadowPluginVersion}"
+        classpath "com.commercehub.gradle.plugin:gradle-avro-plugin:${gradleAvroPluginVersion}"
     }
 }
 
@@ -42,10 +44,11 @@ allprojects {
         scalaTestVersion = "3.2.14"
         junitVersion = "5.7.0"
 
-        // util
+        // etc
         pureconfigVersion = "0.17.1"
         dbcpVersion = "2.9.0"
         commonLangVersion = "3.12.0"
+        avroVersion = "1.11.1"
     }
 
     dependencies {

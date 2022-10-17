@@ -1,9 +1,7 @@
 package core.common
 
-import pureconfig.ConfigSource.default
-import pureconfig.{CamelCase, ConfigFieldMapping, ConfigReader, ConfigSource}
 import pureconfig.generic.ProductHint
-//import pureconfig.generic.auto._
+import pureconfig.{CamelCase, ConfigFieldMapping, ConfigReader, ConfigSource}
 
 import scala.reflect.ClassTag
 
@@ -23,11 +21,6 @@ object Env {
         mode == Environment.local.toString
     }
 
-//    def conf[T: ClassTag] = {
-//        implicit val hint = buildConfigHint[T]()
-//        getConfigOrThrow[T]()
-//    }
-
     def buildConfigHint[T](): ProductHint[T] = {
         ProductHint[T](ConfigFieldMapping(CamelCase, CamelCase))
     }
@@ -41,7 +34,3 @@ object Env {
         ConfigSource.default.at(mode).at(app).loadOrThrow[T]
     }
 }
-
-//trait Config[T] {
-//    val conf: T = Env.conf[T]
-//}
