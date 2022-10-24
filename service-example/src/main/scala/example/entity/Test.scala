@@ -1,3 +1,3 @@
-package example.model
+package example.entity
 
 case class Test(value: Int)

@@ -9,6 +9,7 @@ import scala.util.Using
 
 trait SparkBase {
     val logger = LoggerFactory.getLogger(this.getClass)
+    val referenceConf = Env.referenceConf
     var session: SparkSession = null
 
     def driver(session: SparkSession, args: Array[String]): Unit

@@ -12,7 +12,8 @@ import java.util.TimeZone
 import java.util.concurrent.atomic.AtomicLong
 
 object SparkUtil {
-    val outputRows = new AtomicLong()
+    private val outputRows = new AtomicLong()
+
 
     /**
      * local, dev, prd 환경에 맞는 SparkSession 생성
@@ -31,7 +32,7 @@ object SparkUtil {
      */
     def measurementTPS(spark: SparkSession, bootstrapServers: String, key: String) = {
         val context = spark.sparkContext
-        val producer = KafkaProducerFactory.getProducer(bootstrapServers, "tps-metric")
+        val producer = KafkaProducerFactory.getProducer(bootstrapServers, Env.referenceConf.tpsMetric)
         val utcFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
         utcFormat.setTimeZone(TimeZone.getTimeZone("UTC"))
         val kscFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")

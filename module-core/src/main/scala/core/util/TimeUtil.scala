@@ -15,6 +15,16 @@ object TimeUtil {
     }
 
     /**
+     * @param date 'yyyyMMdd' formatted String
+     * @param time 'HHmmSS' formatted String
+     */
+    def dateToTimestamp(date: String, time: String = "000000"): Long = {
+        val formatterInput = DateTimeFormatter.ofPattern("yyyyMMddHHmmss")
+        val ldt = LocalDateTime.parse(date + time, formatterInput)
+        ldt.toInstant(ZoneOffset.UTC).toEpochMilli
+    }
+
+    /**
      * @param partition 'yyyyMMdd' formatted String
      */
     def convertPartitionToDateString(partition: String): String = {

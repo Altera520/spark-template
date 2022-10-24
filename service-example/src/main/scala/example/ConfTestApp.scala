@@ -2,7 +2,7 @@ package example
 
 import core.common.{Env, SparkBase}
 import core.util.SqlUtil
-import example.model.{ExampleConf, Test}
+import example.entity.{Conf, Test}
 import org.apache.spark.sql.SparkSession
 import pureconfig.generic.auto._
 
@@ -14,8 +14,8 @@ object ConfTestApp extends SparkBase {
 
         logger.info("{}", rows(0))
 
-        implicit val hint = Env.buildConfigHint[ExampleConf]()
-        val conf = Env.getConfigOrThrow[ExampleConf]()
+        implicit val hint = Env.buildConfigHint[Conf]()
+        val conf = Env.getConfigOrThrow[Conf]()
 
         val rows2 = SqlUtil.select(s"select value from ${conf.tableName}", rs => {
             Test(rs.getInt("value"))

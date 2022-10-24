@@ -1,4 +1,4 @@
-package core.service
+package core.sync
 
 import org.apache.spark.sql.{ForeachWriter, Row}
 

@@ -2,7 +2,7 @@ package example
 
 import core.common.Env
 import core.util.SparkUtil
-import example.model.ExampleConf
+import example.entity.Conf
 import org.scalatest.funsuite.AnyFunSuite
 
 class ProjectBaseTest extends AnyFunSuite {
@@ -25,8 +25,8 @@ class ProjectBaseTest extends AnyFunSuite {
     test("conf_test") {
         // given & when
         import pureconfig.generic.auto._
-        implicit val hint = Env.buildConfigHint[ExampleConf]()
-        val conf = Env.getConfigOrThrow[ExampleConf]()
+        implicit val hint = Env.buildConfigHint[Conf]()
+        val conf = Env.getConfigOrThrow[Conf]()
 
         // then
         assert(conf.tableName == "test2")
