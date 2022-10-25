@@ -33,7 +33,7 @@ object Env {
     }
 
     def getConfigOrThrow[T: ClassTag: ConfigReader]()(implicit productHint: ProductHint[T]): T = {
-        // application.conf -> resources/reference.conf 순으로 merge된다
+        // application.conf -> embedded resources/reference.conf 순으로 merge된다
         ConfigSource.default.at(mode).loadOrThrow[T]
     }
 

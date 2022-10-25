@@ -1,6 +1,6 @@
 package core
 
-import core.util.TimeUtil
+import core.util.{JsonUtil, JsonWrapper, TimeUtil}
 import org.scalatest.funsuite.AnyFunSuite
 
 import java.time.{LocalDate, LocalDateTime, ZoneId}
@@ -27,5 +27,24 @@ class TimeUtil extends AnyFunSuite {
 
         // then
         assert(LocalDate.of(2022, 10, 24) == dt.toLocalDate)
+    }
+
+    test("tt") {
+        case class Te(url: String, timestamp: Long)
+//        import io.circe._
+//        import io.circe.generic.auto._
+//        import io.circe.parser._
+//        import io.circe.syntax._
+
+        //println(Te("www.namver.com", java.time.Instant.now().toEpochMilli).asJson.noSpaces)
+
+        print(JsonUtil.toJson(Map("url" -> "www.naver.com")))
+
+//        val out = JsonUtil.toJson(Map(
+//            "url" -> "www",
+//            "timestamp" -> 15203030
+//        ))
+//        println(out)
+
     }
 }

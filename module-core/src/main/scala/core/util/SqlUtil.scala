@@ -35,10 +35,9 @@ object DBCP {
 object SqlUtil {
     def selectThroughFile[T](path: String, replacements: (String, Any)*)(bind: ResultSet => T): List[T] = {
         var sql = Source.fromResource(path).mkString("\n")
-        sql = replacements.foldLeft(sql)((sql, replacements) => {
-            val (k, v) = replacements
+        sql = replacements.foldLeft(sql){ case (sql, (k, v)) =>
             sql.replaceAll("[$]\\{" + k + "\\}", v.toString)
-        })
+        }
         select(sql, bind)
     }
 

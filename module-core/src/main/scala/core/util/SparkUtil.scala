@@ -2,9 +2,8 @@ package core.util
 
 import core.common.Env
 import core.entity.TpsMetric
-import core.service.KafkaProducerFactory
 import org.apache.spark.scheduler.{SparkListener, SparkListenerTaskEnd}
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.streaming.StreamingQueryListener
 
 import java.text.SimpleDateFormat
@@ -14,16 +13,25 @@ import java.util.concurrent.atomic.AtomicLong
 object SparkUtil {
     private val outputRows = new AtomicLong()
 
-
     /**
      * local, dev, prd 환경에 맞는 SparkSession 생성
      * @return
      */
     def buildSparkSession(): SparkSession = {
-        var sessionBuilder = SparkSession.builder().enableHiveSupport()
-        if (Env.isLocalMode)
-            sessionBuilder = sessionBuilder.master("local[*]")
-        sessionBuilder.getOrCreate()
+        val sessionBuilder = SparkSession.builder().enableHiveSupport()
+        (if (Env.isLocalMode)
+            sessionBuilder.master("local[*]")
+        else {
+            sessionBuilder
+              // allow hive dynamic partition
+              .config("hive.exec.dynamic.partition", "true")
+              .config("hive.exec.dynamic.partition", "nonstrict")
+              .config("hive.input.dir.recursive", "true")
+              .config("hive.mapred.supports.subdirectories", "true")
+              .config("hive.supports.subdirectories", "true")
+              .config("mapred.input.dir.recursive", "true")
+              .config("spark.hadoop.mapreduce.input.fileinputformat.input.dir.recursive", "true")
+        }).getOrCreate()
     }
 
     /**
@@ -32,7 +40,7 @@ object SparkUtil {
      */
     def measurementTPS(spark: SparkSession, bootstrapServers: String, key: String) = {
         val context = spark.sparkContext
-        val producer = KafkaProducerFactory.getProducer(bootstrapServers, Env.referenceConf.tpsMetric)
+        val producer = KafkaUtil.getProducer(bootstrapServers, Env.referenceConf.tpsMetric)
         val utcFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
         utcFormat.setTimeZone(TimeZone.getTimeZone("UTC"))
         val kscFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
@@ -65,6 +73,22 @@ object SparkUtil {
 
             override def onQueryTerminated(event: StreamingQueryListener.QueryTerminatedEvent): Unit = {}
         })
+    }
+
+    /**
+     * executor와 core수에 맞게 리파티션 진행
+     * @param session
+     * @param df
+     * @return
+     */
+    def appropriateRepartition(session: SparkSession, df: DataFrame) = {
+        val numExecutor = session.conf.get("spark.executor.instances", "1").toInt
+        val numExecutorCore = session.conf.get("spark.executor.cores", "1").toInt
+        val numPartition = numExecutor * numExecutorCore
+
+        // repartition
+        if (numPartition <= 1) df
+        else df.repartition(numPartition)
     }
 
     /**

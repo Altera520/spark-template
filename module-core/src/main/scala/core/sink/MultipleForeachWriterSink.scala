@@ -1,15 +1,15 @@
-package core.sync
+package core.sink
 
 import org.apache.spark.sql.{ForeachWriter, Row}
 
 import scala.collection.mutable.ArrayBuffer
 
-class AdaptableForeachWriter extends ForeachWriter[Row] {
+class MultipleForeachWriterSink extends ForeachWriter[Row] {
 
     protected val writers = new ArrayBuffer[ForeachWriter[Row]]()
 
     def add(t: ForeachWriter[Row]): Unit = {
-        writers :+ t
+        writers.append(t)
     }
 
     override def open(partitionId: Long, epochId: Long): Boolean = {
