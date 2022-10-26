@@ -1,6 +1,8 @@
 package core
 
-import core.util.{JsonUtil, JsonWrapper, TimeUtil}
+import core.util.{JsonUtil, TimeUtil}
+import org.apache.spark.sql.Encoders
+import org.apache.spark.sql.custom.StreamUnitTestUtil
 import org.scalatest.funsuite.AnyFunSuite
 
 import java.time.{LocalDate, LocalDateTime, ZoneId}

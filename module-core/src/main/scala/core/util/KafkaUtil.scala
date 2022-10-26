@@ -51,7 +51,7 @@ class KafkaAdminClientWrapper(bootstrapServers: String) {
     }
 
     /**
-     * timestamp에 대응하는 offset 반환
+     * topic의 timestamp에 대응하는 offset 반환
      * @param topic
      * @param timestamp
      * @return Iterable[(partition, offset)]
