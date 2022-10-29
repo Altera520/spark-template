@@ -14,7 +14,12 @@ object ParquetSource {
           .load(readLocation)
     }
 
-    def read() = {
-
+    def read(session: SparkSession,
+             readLocation: String,
+             schema: StructType) = {
+        session.read
+          .format("parquet")
+          .schema(schema)
+          .load(readLocation)
     }
 }

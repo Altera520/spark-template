@@ -2,16 +2,13 @@ package core.util
 
 import core.common.Env
 import core.entity.TpsMetric
-import org.apache.spark.scheduler.{SparkListener, SparkListenerTaskEnd}
-import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.streaming.StreamingQueryListener
+import org.apache.spark.sql.{DataFrame, SparkSession}
 
 import java.text.SimpleDateFormat
 import java.util.TimeZone
-import java.util.concurrent.atomic.AtomicLong
 
 object SparkUtil {
-    private val outputRows = new AtomicLong()
 
     /**
      * local, dev, prd 환경에 맞는 SparkSession 생성
@@ -38,41 +35,9 @@ object SparkUtil {
      * spark streams에서 TPS 측정
      * @param spark
      */
-    def measurementTPS(spark: SparkSession, bootstrapServers: String, key: String) = {
-        val context = spark.sparkContext
-        val producer = KafkaUtil.getProducer(bootstrapServers, Env.referenceConf.tpsMetric)
-        val utcFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-        utcFormat.setTimeZone(TimeZone.getTimeZone("UTC"))
-        val kscFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-
-        context.addSparkListener(new SparkListener() {
-            override def onTaskEnd(taskEnd: SparkListenerTaskEnd): Unit = {
-                outputRows.getAndAdd(taskEnd.taskMetrics.outputMetrics.recordsWritten)
-            }
-        })
-
-        spark.streams.addListener(new StreamingQueryListener() {
-            override def onQueryStarted(event: StreamingQueryListener.QueryStartedEvent): Unit = {}
-
-            override def onQueryProgress(event: StreamingQueryListener.QueryProgressEvent): Unit = {
-                val totalSec = Math.max(event.progress.batchDuration / 1000, 1)
-                val tpsMetric = TpsMetric(
-                    totalSec,
-                    min = totalSec / 60,
-                    sec = totalSec % 60,
-                    start = kscFormat.format(utcFormat.parse(event.progress.timestamp).getTime),
-                    end = kscFormat.format(java.time.Instant.now().toEpochMilli),
-                    inputRows = event.progress.numInputRows,
-                    outputRows = outputRows.get(),
-                    tps = outputRows.get() / totalSec
-                )
-
-                producer.produce(key, tpsMetric)
-                outputRows.set(0)
-            }
-
-            override def onQueryTerminated(event: StreamingQueryListener.QueryTerminatedEvent): Unit = {}
-        })
+    def measurementTPS(session: SparkSession, postProcess: TpsMetric => Unit) = {
+        val service = new TpsMeasurementService
+        service(session, postProcess)
     }
 
     /**
@@ -106,5 +71,51 @@ object SparkUtil {
                 else Array("default", str)
             s"/user/hive/warehouse/$schemaName.db/$tableName"
         }
+    }
+}
+
+
+private[util] class TpsMeasurementService {
+//    private var outputRows: Long = 0
+
+    def apply(session: SparkSession, postProcess: TpsMetric => Unit) = {
+//        val context = session.sparkContext
+        val utcFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+        utcFormat.setTimeZone(TimeZone.getTimeZone("UTC"))
+        val kscFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+
+//        context.addSparkListener(new SparkListener() {
+//            override def onTaskEnd(taskEnd: SparkListenerTaskEnd): Unit = {
+//                println("####### end task #########")
+//                println(s"stageId: ${taskEnd.stageId}, taskId: ${taskEnd.taskInfo.taskId}, executorId: ${taskEnd.taskInfo.executorId}")
+//                synchronized {
+//                    // driver <- executor
+//                    outputRows += taskEnd.taskMetrics.outputMetrics.recordsWritten
+//                }
+//            }
+//        })
+
+        session.streams.addListener(new StreamingQueryListener() {
+            override def onQueryStarted(event: StreamingQueryListener.QueryStartedEvent): Unit = {}
+
+            override def onQueryProgress(event: StreamingQueryListener.QueryProgressEvent): Unit = {
+                val totalSec = Math.max(event.progress.batchDuration / 1000, 1)
+                val tpsMetric = TpsMetric(
+                    totalSec,
+                    min = totalSec / 60,
+                    sec = totalSec % 60,
+                    start = kscFormat.format(utcFormat.parse(event.progress.timestamp).getTime),
+                    end = kscFormat.format(java.time.Instant.now().toEpochMilli),
+                    inputRows = event.progress.numInputRows,
+                    outputRows = event.progress.sink.numOutputRows,
+                    tps = event.progress.sink.numOutputRows / totalSec
+                )
+
+                postProcess(tpsMetric)
+                //outputRows = 0
+            }
+
+            override def onQueryTerminated(event: StreamingQueryListener.QueryTerminatedEvent): Unit = {}
+        })
     }
 }

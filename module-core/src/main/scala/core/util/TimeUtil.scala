@@ -1,7 +1,7 @@
 package core.util
 
 import java.time.format.DateTimeFormatter
-import java.time.{Instant, LocalDate, LocalDateTime, ZoneOffset}
+import java.time.{Clock, Instant, LocalDate, LocalDateTime, ZoneId, ZoneOffset}
 
 object TimeUtil {
 
@@ -22,6 +22,12 @@ object TimeUtil {
         val formatterInput = DateTimeFormatter.ofPattern("yyyyMMddHHmmss")
         val ldt = LocalDateTime.parse(date + time, formatterInput)
         ldt.toInstant(ZoneOffset.UTC).toEpochMilli
+    }
+
+    def getKstEpochMillis() = {
+
+        Clock.system(ZoneId.of("Asia/Seoul")).millis()
+        //java.time.Instant.now(Clock.system(ZoneId.of("Asia/Seoul"))).toEpochMilli
     }
 
     /**

@@ -7,5 +7,4 @@ case class ReferenceConf(dbUrl: String,
                          dsMaxTotal: Int,
                          dsMaxIdle: Int,
                          dsMinIdle: Int,
-                         dsMaxWaitMillis: Long,
-                         tpsMetric: String)
+                         dsMaxWaitMillis: Long)

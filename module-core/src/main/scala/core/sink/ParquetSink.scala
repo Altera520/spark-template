@@ -10,6 +10,7 @@ object ParquetSink {
         df.write
           .mode(saveMode)
           .option("parquet.enable.dictionary", "true")
+          // 단위는 MB
           .option("parquet.block.size", s"${32 * 1024 * 1024}")
           .option("parquet.page.size", s"${2 * 1024 * 1024}")
           .option("parquet.dictionary.page.size", s"${8 * 1024 * 1024}")

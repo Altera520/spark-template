@@ -16,12 +16,14 @@ object KafkaSource {
     def readStream(session: SparkSession,
                    bootstrapServers: String,
                    topic: String,
+                   maxOffsetsPerTrigger: Int,
                    options: Map[String, String] = Map()) = {
         val df = session.readStream
           .format("kafka")
           .option("kafka.bootstrap.servers", bootstrapServers)
           .option("subscribe", topic)
           .option("startingOffsets", "latest")
+          .option("maxOffsetsPerTrigger", maxOffsetsPerTrigger)
           .options(options)
           .load()
         df
@@ -46,7 +48,7 @@ object KafkaSource {
             val values = KafkaUtil.getAdminClient(bootstrapServers).getOffsetByTimestamp(topic, timestamp).map {
                 case (partition, offset) => partition.toString -> offset.getOrElse(`else`)
             }
-            JsonUtil.toJson(Map(topic -> values.toMap))
+            JsonUtil.toJson(Map("values" -> values.toMap))
         }
 
         val df = session.read
