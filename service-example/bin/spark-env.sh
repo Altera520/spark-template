@@ -3,7 +3,10 @@
 SPARK_HOME="$BDP_HOME/spark"
 CONF="$HOME/spark/conf"
 LIB="$HOME/spark/lib"
+
+# use G1GC
 GC_OPT="-XX:+UseG1GC -verbose:gc -XX:+PrintGCTimeStamps -XX:+UnlockDiagnosticVMOptions -XX:+G1SummarizeConcMark -XX:InitiatingHeapOccupancyPercent=35 -XX:+UseLargePagesInMetaspace"
+# reference conf
 REFERENCE_CONF="-DDB_URL=jdbc:mysql://bdp-nn1:3306/test -DDB_DRIVER_CLASSNAME=com.mysql.cj.jdbc.Driver -DDB_USERNAME=test -DDB_PASSWORD=test"
 
 function join_by {
