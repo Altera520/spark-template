@@ -15,14 +15,23 @@ object SparkUtil {
      * @return
      */
     def buildSparkSession(): SparkSession = {
-        val sessionBuilder = SparkSession.builder().enableHiveSupport()
+        val sessionBuilder = SparkSession
+          .builder()
+          .enableHiveSupport()
+          // allow hive dynamic partition
+          .config("hive.exec.dynamic.partition", "true")            // 동적 partition 수행 허용
+          .config("hive.exec.dynamic.partition.mode", "nonstrict")  // partition key 자동생성
+
         (if (Env.isLocalMode)
-            sessionBuilder.master("local[*]")
+            sessionBuilder
+              .master("local[*]")
+              // use embedded hive (in-memory instance of Apache Derby as stand in for Hive database)
+//              .config("spark.hadoop.javax.jdo.option.ConnectionDriverName", "org.apache.derby.jdbc.EmbeddedDriver")
+//              .config("spark.hadoop.javax.jdo.option.ConnectionURL", "jdbc:derby:memory:default;create=true")
+//              .config("spark.hadoop.javax.jdo.option.ConnectionUserName", "hive")
+//              .config("spark.hadoop.javax.jdo.option.ConnectionPassword", "hive")
         else {
             sessionBuilder
-              // allow hive dynamic partition
-              .config("hive.exec.dynamic.partition", "true")
-              .config("hive.exec.dynamic.partition", "nonstrict")
               .config("hive.input.dir.recursive", "true")
               .config("hive.mapred.supports.subdirectories", "true")
               .config("hive.supports.subdirectories", "true")

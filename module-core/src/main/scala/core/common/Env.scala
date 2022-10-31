@@ -1,6 +1,5 @@
 package core.common
 
-import core.entity.ReferenceConf
 import pureconfig.generic.ProductHint
 import pureconfig.generic.auto._
 import pureconfig.{CamelCase, ConfigFieldMapping, ConfigReader, ConfigSource}
@@ -17,11 +16,6 @@ object Env {
     lazy val mode = {
         val env = System.getProperty("APP_MODE", Environment.local.toString)
         Environment.withName(env.toLowerCase()).toString
-    }
-
-    lazy val referenceConf = {
-        implicit val hint = Env.buildConfigHint[ReferenceConf]()
-        Env.getConfigOrThrow[ReferenceConf]()
     }
 
     def isLocalMode = {

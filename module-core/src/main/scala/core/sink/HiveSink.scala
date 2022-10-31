@@ -14,24 +14,22 @@ object HiveSink {
      * @param dstTable 적재대상 테이블
      * @param partitionColumn partition으로 나누어진 테이블에는 지정해야한다.
      * @param timestampColumn CDC(timestamp on rows) 대상 컬럼
-     * @param primaryColumn pk
-     * @param primaryColumns
+     * @param primaryColumns pk
      * @param df
      * @return
      */
     def write(dstTable: String,
-              partitionColumn: Option[String],
-              timestampColumn: Option[String],
-              primaryColumn: Option[String],
-              primaryColumns: String*)(df: DataFrame): Unit = {
+              partitionColumn: Option[String] = None,
+              timestampColumn: Option[String] = None,
+              primaryColumns: Option[Seq[String]] = None)(df: DataFrame): Unit = {
         val session = df.sparkSession
 
         if (session.catalog.tableExists(dstTable)) insertInto(dstTable, SaveMode.Append)(df)
         else saveAsTable(dstTable, partitionColumn)(df)
 
-        (timestampColumn, primaryColumn, df.rdd.isEmpty) match {
-            case (Some(timestampCol), Some(primaryCol), false) =>
-                val distinctedDF = distinctTable(dstTable, partitionColumn, timestampCol, primaryCol, primaryColumns:_*)(df)
+        (timestampColumn, primaryColumns, df.rdd.isEmpty) match {
+            case (Some(timestampCol), Some(primaryCols), false) =>
+                val distinctedDF = distinctTable(dstTable, partitionColumn, timestampCol, primaryCols)(df)
                 insertInto(dstTable, SaveMode.Overwrite)(distinctedDF)
             case _ =>
         }
@@ -47,7 +45,7 @@ object HiveSink {
      */
     def insertInto(dstTable: String, saveMode: SaveMode)(df: DataFrame) = {
         val session = df.sparkSession
-        val columns = hiveTableSchema(session, dstTable)
+        val columns = schema(session, dstTable)
 
         df.selectExpr(columns: _*) // sort column order
           .write
@@ -84,13 +82,12 @@ object HiveSink {
     def distinctTable(dstTable: String,
                       partitionColumn: Option[String],
                       timestampColumn: String,
-                      primaryColumn: String,
-                      primaryColumns: String*)(df: DataFrame) = {
+                      primaryColumns: Seq[String])(df: DataFrame) = {
         val session = df.sparkSession
         import session.implicits._
 
         val windowFunc = Window
-          .partitionBy((primaryColumns :+ primaryColumn).map(col): _*)
+          .partitionBy(primaryColumns.map(col): _*)
           .orderBy($"$timestampColumn".desc)
 
         val whereStmt = partitionColumn match {
@@ -118,7 +115,7 @@ object HiveSink {
      * @param table
      * @return
      */
-    def hiveTableSchema(session: SparkSession, table: String) = {
+    def schema(session: SparkSession, table: String) = {
         import session.implicits._
         val columns = session.catalog.listColumns(table).map(_.name).collect().toList
         columns

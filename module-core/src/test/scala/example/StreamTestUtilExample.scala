@@ -20,7 +20,9 @@ class StreamTestUtilExample extends AnyFunSuite {
         )
         val stream = new SparkStreamTestUtil()
         val df = stream.readStream(schema)
-        val query = stream.writeStream(df, OutputMode.Update())
+        // process logic을 이 사이에 위치시키면 된다.
+        val processedDF = df
+        val query = stream.writeStream(processedDF, OutputMode.Update())
 
         // # batch 0
         stream.produce(JsonUtil.toJson(Map("url" -> "www.naver.com", "timestamp" -> 1000L)), 0L)
