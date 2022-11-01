@@ -1,9 +1,11 @@
 package core.sink
 
+import core.util.SparkUtil
 import core.util.SparkUtil.StringExt
 import org.apache.commons.lang3.StringUtils
 import org.apache.spark.sql.expressions.Window
 import org.apache.spark.sql.functions.{col, lit, row_number}
+import org.apache.spark.sql.streaming.{OutputMode, Trigger}
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 
 object HiveSink {
@@ -135,5 +137,23 @@ object HiveSink {
           .count()
           .collect()
           .map(_._1)
+    }
+
+    def writeStream(df: DataFrame,
+                    outputMode: OutputMode,
+                    dstTable: String,
+                    trigger: Trigger,
+                    checkpointLocation: Option[String] = None,
+                    partitionColumn: Option[String] = None) = {
+        ParquetSink.writeStream(
+            df,
+            outputMode,
+            checkpointLocation match {
+                case Some(location) => location
+                case _ => SparkUtil.mkCheckpointLocation(dstTable)
+            },
+            dstTable.toHivePath(),
+            trigger,
+            partitionColumn)
     }
 }

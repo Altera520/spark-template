@@ -36,8 +36,9 @@ object TimeUtil {
      * @return
      */
     def epochMillisToDateString(epochMillis: Long, pattern: String = "yyyy-MM-dd HH:mm:ss.SSS") = {
-        val fmt = DateTimeFormatter.ofPattern(pattern)
+        val fmt = DateTimeFormatter.ofPattern(pattern).withZone(ZoneId.of("Asia/Seoul"))
         fmt.format(Instant.ofEpochMilli(epochMillis))
+
     }
 
     /**

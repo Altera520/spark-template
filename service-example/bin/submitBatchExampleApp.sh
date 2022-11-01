@@ -10,7 +10,7 @@ source ./spark-env.sh
 # local | dev | prd
 APP_MODE=${MODE:-prd}
 JAR_NAME=service-example-0.0.1-SNAPSHOT-all.jar
-MAIN_CLASS=${MAIN_CLASS}
+MAIN_CLASS=${MAIN_CLASS-'example.BatchExampleApp'}
 APP_NAME=${APP_NAME:-$MAIN_CLASS}
 DEPLOY_MODE=client
 CONFIG_FILE="service-example.conf"

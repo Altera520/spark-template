@@ -10,7 +10,7 @@ source ./spark-env.sh
 # local | dev | prd
 APP_MODE=${MODE:-prd}
 JAR_NAME=service-example-0.0.1-SNAPSHOT-all.jar
-MAIN_CLASS=${MAIN_CLASS}
+MAIN_CLASS=${MAIN_CLASS:-'example.StreamExampleApp'}
 APP_NAME=${APP_NAME:-$MAIN_CLASS}
 DEPLOY_MODE=client
 CONFIG_FILE="service-example.conf"
@@ -28,7 +28,6 @@ OPTS="
 -DAPP_MODE=${APP_MODE}
 ${GC_OPT}
 $(config_opt $DEPLOY_MODE $CONFIG_FILE)
-${REFERENCE_CONF}
 "
 
 # yarn resources
@@ -56,4 +55,3 @@ ${SPARK_HOME}/bin/spark-submit \
  --files $(join_by ',' . $FILES) \
  --jars $(join_by ',' . $JARS) \
  --class ${MAIN_CLASS} $LIB/$JAR_NAME $@
-
