@@ -23,10 +23,6 @@ class SparkStreamTestUtil(processingTime: Long = TimeUtil.getKstEpochMillis()) {
     val processingTimeClock = new ManualClock(processingTime)
     val memorySink = new MemorySink
 
-//    def produce[T, U](value: Map[T, U], processingTime: Long): Unit = {
-//        this.produce(JsonUtil.toJson(value), processingTime)
-//    }
-
     /**
      * @param value json format string
      * @return

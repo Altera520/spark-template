@@ -1,8 +1,7 @@
 package core.util
 
-import core.common.Env
 import org.apache.commons.dbcp2.BasicDataSource
-import pureconfig.generic.auto._
+import org.apache.commons.lang3.StringUtils
 
 import java.sql.ResultSet
 import scala.collection.mutable
@@ -10,30 +9,13 @@ import scala.collection.mutable.ListBuffer
 import scala.io.Source
 import scala.util.Using
 
-//object DBCP {
-//    private val ds = new BasicDataSource
-//    implicit val hint = Env.buildConfigHint[ReferenceConf]()
-//    val conf = Env.getConfigOrThrow[ReferenceConf]()
-//
-//    ds.setDriverClassName(conf.dbDriverClassName)
-//    ds.setUrl(conf.dbUrl)
-//    ds.setUsername(conf.dbUsername)
-//    ds.setPassword(conf.dbPassword)
-//
-//    // maxTotal = maxIdle, maxTotal >= initialSize
-//    ds.setMaxTotal(conf.dsMaxTotal)
-//
-//    // maxIdle >= minIdle, maxTotal = maxIdle
-//    ds.setMaxIdle(conf.dsMaxIdle)
-//    ds.setMinIdle(conf.dsMinIdle)
-//
-//    ds.setMaxWaitMillis(conf.dsMaxWaitMillis)
-//
-//    def getConnection = ds.getConnection
-//}
 
-object SqlUtil {
+object JdbcUtil {
     private val dbcpPool = mutable.HashMap[String, DBCP]()  // key: rdb url
+
+    def add(dbcp: DBCP) = {
+        dbcpPool.put(dbcp.url, dbcp)
+    }
 
     def buildSql(sql: String, replacements: (String, Any)*) = {
         replacements.foldLeft(sql){ case (sql, (k, v)) =>
@@ -42,11 +24,17 @@ object SqlUtil {
     }
 
     def selectThroughFile[T](url: String, path: String, replacements: (String, Any)*)(bind: ResultSet => T): List[T] = {
-        val sql = Source.fromResource(path).mkString("\n")
-        select(url, buildSql(sql, replacements: _*), bind)
+        val sql = Source.fromResource(path).mkString(StringUtils.EMPTY)
+        execute(url, buildSql(sql, replacements: _*), bind)
     }
 
-    def select[T](url: String, sql: String, bind: ResultSet => T): List[T] = {
+    def execute(url: String, sql: String): List[Null] = {
+        def dummy(rs: ResultSet): Null = null
+        execute(url, sql, dummy)
+    }
+
+    def execute[T](url: String, sql: String, bind: ResultSet => T): List[T] = {
+        if (!dbcpPool.contains(url)) throw new NoSuchElementException
         val beans = ListBuffer[T]()
         Using.Manager { use =>
             val conn = use(dbcpPool(url).getConnection)
@@ -57,17 +45,23 @@ object SqlUtil {
         beans.toList
     }
 
-    def describe(dstTable: String) = {
+    def describe(url: String, dstTable: String): List[String] = {
+        val sql = dbcpPool(url).driver match {
+            // mysql
+            case "com.mysql.cj.jdbc.Driver" => s"show columns from $dstTable"
+            // oracle
+            case "oracle.jdbc.driver.OracleDriver" => s"desc $dstTable"
+            case _ => throw new IllegalArgumentException
+        }
 
-    }
-
-    def tmp() = {
-
+        execute(url, sql, rs => {
+            rs.getString(0)
+        })
     }
 }
 
-class DBCP(driver: String,
-           url: String,
+class DBCP(val driver: String,
+           val url: String,
            user: String,
            password: String,
            maxTotal: Int = 8,

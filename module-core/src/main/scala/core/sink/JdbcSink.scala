@@ -1,6 +1,6 @@
 package core.sink
 
-import core.util.SqlUtil
+import core.util.JdbcUtil
 import org.apache.spark.sql.{DataFrame, SaveMode}
 
 object JdbcSink {
@@ -12,9 +12,6 @@ object JdbcSink {
               saveMode: SaveMode)
              (df: DataFrame) = {
 
-        //val columns = schema(dstTable, driver)
-
-        //df.selectExpr(columns: _*) // sort column order
         df
           .write
           .format("jdbc")
@@ -26,11 +23,4 @@ object JdbcSink {
           .mode(saveMode)
           .save()
     }
-
-//    def schema(dstTable: String, driver: String) = {
-//        driver match {
-//            case "" => SqlUtil.select(s"show columns from $dstTable", _.getString(0))
-//            case _ => new IllegalArgumentException()
-//        }
-//    }
 }

@@ -1,5 +1,6 @@
 package util
 
+import core.common.Env
 import core.util.{JsonUtil, SparkUtil}
 import org.apache.spark.sql.custom.SparkStreamTestUtil
 import org.apache.spark.sql.streaming.OutputMode
@@ -31,4 +32,5 @@ class SparkUtilSuite extends AnyFunSuite {
         stream.produce(JsonUtil.toJson(Map("url" -> "www.naver.com", "timestamp" -> 1000L)), 0L)
         query.processAllAvailable()
     }
+
 }

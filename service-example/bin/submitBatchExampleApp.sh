@@ -28,7 +28,6 @@ OPTS="
 -DAPP_MODE=${APP_MODE}
 ${GC_OPT}
 $(config_opt $DEPLOY_MODE $CONFIG_FILE)
-${REFERENCE_CONF}
 "
 
 # yarn resources

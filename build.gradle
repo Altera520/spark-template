@@ -49,7 +49,7 @@ allprojects {
         dbcpVersion = "2.9.0"
         commonLangVersion = "3.12.0"
         avroVersion = "1.11.1"
-        //json4sVersion = '4.0.6'
+        testcontainersVersion = "0.40.11"
     }
 
     dependencies {

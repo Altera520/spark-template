@@ -17,12 +17,13 @@ object KafkaSource {
                    bootstrapServers: String,
                    topic: String,
                    maxOffsetsPerTrigger: Int,
+                   startingOffsets: String = "latest",
                    options: Map[String, String] = Map()) = {
         val df = session.readStream
           .format("kafka")
           .option("kafka.bootstrap.servers", bootstrapServers)
           .option("subscribe", topic)
-          .option("startingOffsets", "latest")
+          .option("startingOffsets", startingOffsets)
           .option("maxOffsetsPerTrigger", maxOffsetsPerTrigger)
           .options(options)
           .load()

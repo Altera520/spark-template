@@ -25,11 +25,6 @@ object SparkUtil {
         (if (Env.isLocalMode)
             sessionBuilder
               .master("local[*]")
-              // use embedded hive (in-memory instance of Apache Derby as stand in for Hive database)
-//              .config("spark.hadoop.javax.jdo.option.ConnectionDriverName", "org.apache.derby.jdbc.EmbeddedDriver")
-//              .config("spark.hadoop.javax.jdo.option.ConnectionURL", "jdbc:derby:memory:default;create=true")
-//              .config("spark.hadoop.javax.jdo.option.ConnectionUserName", "hive")
-//              .config("spark.hadoop.javax.jdo.option.ConnectionPassword", "hive")
         else {
             sessionBuilder
               .config("hive.input.dir.recursive", "true")
@@ -75,10 +70,22 @@ object SparkUtil {
          * @return
          */
         def toHivePath() = {
+            val prefix = getHiveWarehousePath
             val Array(schemaName, tableName) =
                 if(str.indexOf(".") > 0) str.split("\\.")
                 else Array("default", str)
-            s"/user/hive/warehouse/$schemaName.db/$tableName"
+
+            Env.isLocalMode match {
+                case true => s"$prefix/$tableName"
+                case _ => s"$prefix/$schemaName.db/$tableName"
+            }
+        }
+    }
+
+    def getHiveWarehousePath() = {
+        Env.isLocalMode match {
+            case true => s"file://${sys.props("user.dir")}/spark-warehouse"
+            case _ => "/user/hive/warehouse"
         }
     }
 }
