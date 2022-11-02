@@ -45,18 +45,7 @@ object JdbcUtil {
      */
     def selectThroughFile[T](url: String, path: String, replacements: (String, Any)*)(bind: ResultSet => T): List[T] = {
         val sql = Source.fromResource(path).mkString(StringUtils.EMPTY)
-        execute(url, buildSql(sql, replacements: _*), bind)
-    }
-
-    /**
-     * bind를 수행하지않는 쿼리함수
-     * @param url
-     * @param sql
-     * @return
-     */
-    def execute(url: String, sql: String): List[Null] = {
-        def dummy(rs: ResultSet): Null = null
-        execute(url, sql, dummy)
+        select(url, buildSql(sql, replacements: _*), bind)
     }
 
     /**
@@ -67,7 +56,7 @@ object JdbcUtil {
      * @tparam T
      * @return
      */
-    def execute[T](url: String, sql: String, bind: ResultSet => T): List[T] = {
+    def select[T](url: String, sql: String, bind: ResultSet => T): List[T] = {
         if (!dbcpPool.contains(url)) throw new NoSuchElementException
         val beans = ListBuffer[T]()
         Using.Manager { use =>
@@ -88,16 +77,14 @@ object JdbcUtil {
     def describe(url: String, dstTable: String): List[String] = {
         val sql = dbcpPool(url).driver match {
             // mysql, mariadb
-            case x if x.contains(Seq(
+            case x if Seq(
                 "org.mariadb.jdbc.Driver",
-                "com.mysql.cj.jdbc.Driver")) => s"show columns from $dstTable"
-            // oracle
-            case "oracle.jdbc.driver.OracleDriver" => s"desc $dstTable"
+                "com.mysql.cj.jdbc.Driver").contains(x) => s"describe $dstTable"
             case _ => throw new IllegalArgumentException
         }
 
-        execute(url, sql, rs => {
-            rs.getString(0)
+        select(url, sql, rs => {
+            rs.getString("Field")
         })
     }
 }

@@ -19,6 +19,6 @@ dependencies {
     // test
     testCompileOnly group: 'io.github.embeddedkafka', name: "embedded-kafka_${scalaVerisonWithoutPatch}", version: '3.3.1'
     testRuntimeOnly group: 'org.apache.spark', name: "spark-hive_${scalaVerisonWithoutPatch}", version: "${sparkVersion}"
-    testImplementation group: 'com.dimafeng', name: "testcontainers-scala-scalatest_${scalaVerisonWithoutPatch}", version: "${testcontainersVersion}"
-    testImplementation group: 'com.dimafeng', name: "testcontainers-scala-mysql_${scalaVerisonWithoutPatch}", version: "${testcontainersVersion}"
+//    testImplementation group: 'com.dimafeng', name: "testcontainers-scala-scalatest_${scalaVerisonWithoutPatch}", version: "${testcontainersVersion}"
+//    testImplementation group: 'com.dimafeng', name: "testcontainers-scala-mysql_${scalaVerisonWithoutPatch}", version: "${testcontainersVersion}"
 }

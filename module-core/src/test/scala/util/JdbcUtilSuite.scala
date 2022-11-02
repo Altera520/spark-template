@@ -1,22 +1,14 @@
 package util
 
-import com.dimafeng.testcontainers.{ForAllTestContainer, MySQLContainer}
 import core.util.{DBCP, JdbcUtil}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.funsuite.AnyFunSuite
-import org.testcontainers.utility.DockerImageName
 
 import scala.io.Source
 
-class JdbcUtilSuite extends AnyFunSuite with ForAllTestContainer with BeforeAndAfterAll {
+class JdbcUtilSuite extends AnyFunSuite with BeforeAndAfterAll {
 
     private var dstTable: String = _
-
-    override def container: MySQLContainer = MySQLContainer(
-        mysqlImageVersion = DockerImageName.parse("mysql:8"),
-        databaseName = "test-mysql",
-        username = "test",
-        password = "test")
 
     override protected def beforeAll(): Unit = {
         super.beforeAll()
@@ -34,23 +26,12 @@ class JdbcUtilSuite extends AnyFunSuite with ForAllTestContainer with BeforeAndA
         dstTable = "access_log"
         JdbcUtil.add(new DBCP(
             "com.mysql.cj.jdbc.Driver",
-            container.jdbcUrl,
-            "test",
-            password = "test"
+            "jdbc:mysql://localhost:3306/pipeline",
+            "scott",
+            "tiger"
         ))
 
-        JdbcUtil.execute(container.jdbcUrl,
-            s"""
-               |create table if not exists $dstTable(
-               | url varchar(100),
-               | p_dt char(8)
-               |)""".stripMargin)
-
-        JdbcUtil.execute(container.jdbcUrl,
-            s"""
-               |insert into $dstTable values('www.naver.com', '20221031')
-               |""".stripMargin)
-
-        val desc = JdbcUtil.describe(container.jdbcUrl, dstTable)
+        val desc = JdbcUtil.describe("jdbc:mysql://localhost:3306/pipeline", "property_stat")
+        println()
     }
 }

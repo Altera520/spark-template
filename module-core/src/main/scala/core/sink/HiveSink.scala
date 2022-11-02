@@ -142,19 +142,17 @@ object HiveSink {
     /**
      * hive 테이블에 writeStream 수행
      * @param df
-     * @param outputMode
      * @param dstTable
      * @param trigger
+     * @param outputMode
      * @param checkpointLocation
-     * @param partitionColumn
      * @return
      */
     def writeStream(df: DataFrame,
-                    outputMode: OutputMode,
                     dstTable: String,
                     trigger: Trigger,
-                    checkpointLocation: Option[String] = None,
-                    partitionColumn: Option[String] = None) = {
+                    outputMode: OutputMode = OutputMode.Update(),
+                    checkpointLocation: Option[String] = None) = {
 
         def batch(ds: Dataset[Row], batchId: Long): Unit = {
             HiveSink.insertInto(dstTable, SaveMode.Append)(ds)

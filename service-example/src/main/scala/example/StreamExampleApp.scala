@@ -6,7 +6,7 @@ import core.source.KafkaSource
 import core.util.TimeUtil
 import example.entity.Conf
 import org.apache.spark.sql.functions.{get_json_object, lit}
-import org.apache.spark.sql.streaming.{OutputMode, Trigger}
+import org.apache.spark.sql.streaming.Trigger
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import pureconfig.generic.auto._
 
@@ -32,10 +32,8 @@ object StreamExampleApp extends SparkBase {
     def writeStream(dstTable: String)(df: DataFrame) = {
         HiveSink.writeStream(
             df,
-            OutputMode.Append,
             dstTable,
-            Trigger.ProcessingTime("1 minute"),
-            partitionColumn = Some("p_dt")
+            Trigger.ProcessingTime("1 minute")
         )
     }
 
