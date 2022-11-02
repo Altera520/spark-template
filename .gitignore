@@ -229,6 +229,7 @@ metastore_db/
 sql/hive-thriftserver/test_warehouses
 warehouse/
 spark-warehouse/
+spark-checkpoints/
 
 # For R session data
 .RData

@@ -1,7 +1,7 @@
 package core.util
 
 import java.time.format.DateTimeFormatter
-import java.time.{Instant, LocalDate, LocalDateTime, ZoneOffset}
+import java.time.{Clock, Instant, LocalDate, LocalDateTime, ZoneId, ZoneOffset}
 
 object TimeUtil {
 
@@ -22,6 +22,23 @@ object TimeUtil {
         val formatterInput = DateTimeFormatter.ofPattern("yyyyMMddHHmmss")
         val ldt = LocalDateTime.parse(date + time, formatterInput)
         ldt.toInstant(ZoneOffset.UTC).toEpochMilli
+    }
+
+    def getKstEpochMillis() = {
+        Clock.system(ZoneId.of("Asia/Seoul")).millis()
+        //java.time.Instant.now(Clock.system(ZoneId.of("Asia/Seoul"))).toEpochMilli
+    }
+
+    /**
+     * 기계시를 날짜형식의 문자열로 반환
+     * @param epochMillis 기계시
+     * @param pattern 날짜 패턴
+     * @return
+     */
+    def epochMillisToDateString(epochMillis: Long, pattern: String = "yyyy-MM-dd HH:mm:ss.SSS") = {
+        val fmt = DateTimeFormatter.ofPattern(pattern).withZone(ZoneId.of("Asia/Seoul"))
+        fmt.format(Instant.ofEpochMilli(epochMillis))
+
     }
 
     /**

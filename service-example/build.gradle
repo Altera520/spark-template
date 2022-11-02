@@ -24,7 +24,7 @@ jar {
 
 shadowJar {
     zip64 = true
-    exclude "META-INF/**"
+    //exclude "META-INF/**"
     archiveBaseName = project.name
     mergeServiceFiles()
 }

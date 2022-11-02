@@ -1,6 +1,6 @@
 dependencies {
     api "org.apache.commons:commons-dbcp2:${dbcpVersion}"
-    api group: 'mysql', name: 'mysql-connector-java', version: '8.0.30'
+    //api group: 'mysql', name: 'mysql-connector-java', version: '8.0.30'
     api group: 'org.apache.avro', name: 'avro', version: "${avroVersion}"
 
     // logging
@@ -16,6 +16,9 @@ dependencies {
     compileOnlyApi group: 'org.apache.spark', name: "spark-streaming_${scalaVerisonWithoutPatch}", version: "${sparkVersion}"
     api group: 'org.apache.spark', name: "spark-sql-kafka-0-10_${scalaVerisonWithoutPatch}", version: "${sparkVersion}"
 
-    // integration test
-    testImplementation group: 'io.github.embeddedkafka', name: "embedded-kafka_${scalaVerisonWithoutPatch}", version: '3.3.1'
+    // test
+    testCompileOnly group: 'io.github.embeddedkafka', name: "embedded-kafka_${scalaVerisonWithoutPatch}", version: '3.3.1'
+    testRuntimeOnly group: 'org.apache.spark', name: "spark-hive_${scalaVerisonWithoutPatch}", version: "${sparkVersion}"
+//    testImplementation group: 'com.dimafeng', name: "testcontainers-scala-scalatest_${scalaVerisonWithoutPatch}", version: "${testcontainersVersion}"
+//    testImplementation group: 'com.dimafeng', name: "testcontainers-scala-mysql_${scalaVerisonWithoutPatch}", version: "${testcontainersVersion}"
 }

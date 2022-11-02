@@ -1,4 +1,3 @@
 package example.entity
 
-case class Conf(kafkaUrl: String,
-                tableName: String)
+case class Conf(kafkaUrl: String)
