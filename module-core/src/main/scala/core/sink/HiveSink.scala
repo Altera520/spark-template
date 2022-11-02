@@ -6,7 +6,7 @@ import org.apache.commons.lang3.StringUtils
 import org.apache.spark.sql.expressions.Window
 import org.apache.spark.sql.functions.{col, lit, row_number}
 import org.apache.spark.sql.streaming.{OutputMode, Trigger}
-import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
+import org.apache.spark.sql.{DataFrame, Dataset, Row, SaveMode, SparkSession}
 
 object HiveSink {
 
@@ -155,15 +155,19 @@ object HiveSink {
                     trigger: Trigger,
                     checkpointLocation: Option[String] = None,
                     partitionColumn: Option[String] = None) = {
-        ParquetSink.writeStream(
-            df,
-            outputMode,
-            checkpointLocation match {
-                case Some(location) => location
-                case _ => SparkUtil.mkCheckpointLocation(dstTable)
-            },
-            dstTable.toHivePath(),
-            trigger,
-            partitionColumn)
+
+        def batch(ds: Dataset[Row], batchId: Long): Unit = {
+            HiveSink.insertInto(dstTable, SaveMode.Append)(ds)
+        }
+
+        df.writeStream
+          .outputMode(outputMode)
+          .foreachBatch(batch _)
+          .option("checkpointLocation", checkpointLocation match {
+              case Some(location) => location
+              case _ => SparkUtil.mkCheckpointLocation(dstTable)
+          })
+          .trigger(trigger)
+          .start()
     }
 }
