@@ -36,14 +36,4 @@ object JdbcSink {
           .mode(saveMode)
           .save()
     }
-
-    def writeThroughSql(dstTable: String,
-                        driver: String,
-                        url: String,
-                        user: String,
-                        password: String,
-                        saveMode: SaveMode)
-                       (sql: String)= {
-
-    }
 }

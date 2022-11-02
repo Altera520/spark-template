@@ -1,6 +1,6 @@
 dependencies {
     api "org.apache.commons:commons-dbcp2:${dbcpVersion}"
-    api group: 'mysql', name: 'mysql-connector-java', version: '8.0.30'
+    //api group: 'mysql', name: 'mysql-connector-java', version: '8.0.30'
     api group: 'org.apache.avro', name: 'avro', version: "${avroVersion}"
 
     // logging

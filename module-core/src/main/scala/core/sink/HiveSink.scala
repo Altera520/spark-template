@@ -139,6 +139,16 @@ object HiveSink {
           .map(_._1)
     }
 
+    /**
+     * hive 테이블에 writeStream 수행
+     * @param df
+     * @param outputMode
+     * @param dstTable
+     * @param trigger
+     * @param checkpointLocation
+     * @param partitionColumn
+     * @return
+     */
     def writeStream(df: DataFrame,
                     outputMode: OutputMode,
                     dstTable: String,

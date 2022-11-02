@@ -3,11 +3,11 @@ package example
 import core.common.{Env, SparkBase}
 import core.sink.HiveSink
 import core.source.KafkaSource
-import core.util.{SparkUtil, TimeUtil}
+import core.util.TimeUtil
 import example.entity.Conf
 import org.apache.spark.sql.functions.{get_json_object, lit}
 import org.apache.spark.sql.streaming.{OutputMode, Trigger}
-import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
+import org.apache.spark.sql.{DataFrame, SparkSession}
 import pureconfig.generic.auto._
 
 object StreamExampleApp extends SparkBase {
@@ -18,6 +18,7 @@ object StreamExampleApp extends SparkBase {
         val df = KafkaSource.readStream(session, conf.kafkaUrl, topic, maxOffsetsPerTrigger, startingOffsets)
         import session.implicits._
 
+        // debezium-mysql connector로 부터 수집된 데이터에서 payload만 추출
         df.select(
             get_json_object($"value".cast("string"), "$.payload") as "data",
             lit(TimeUtil.epochMillisToDateString(java.time.Instant.now().toEpochMilli, "yyyyMMdd")) as "p_dt"

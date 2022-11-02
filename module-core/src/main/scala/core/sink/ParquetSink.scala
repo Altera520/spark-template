@@ -18,6 +18,7 @@ object ParquetSink {
           .parquet(saveLocation)
     }
 
+    // TODO: MSCK REPAIR TABLE <table_name>해야 적재된 데이터를 hive에서 read 가능, 명령 수행없이 writeStream할수 있도록 수정필요
     def writeStream(df: DataFrame,
                     outputMode: OutputMode,
                     checkpointLocation: String,

@@ -20,6 +20,17 @@ class JdbcUtilSuite extends AnyFunSuite with ForAllTestContainer with BeforeAndA
 
     override protected def beforeAll(): Unit = {
         super.beforeAll()
+
+    }
+
+    test("build_sql") {
+        val sql = Source.fromResource("sql/select.access_log_with_where.sql").mkString("")
+        val dt = "20221031"
+        val buildSql = JdbcUtil.buildSql(sql, ("p_dt", dt)).split("\n").last.trim
+        assert(buildSql == s"where p_dt = '$dt'")
+    }
+
+    test("get_schema") {
         dstTable = "access_log"
         JdbcUtil.add(new DBCP(
             "com.mysql.cj.jdbc.Driver",
@@ -39,18 +50,7 @@ class JdbcUtilSuite extends AnyFunSuite with ForAllTestContainer with BeforeAndA
             s"""
                |insert into $dstTable values('www.naver.com', '20221031')
                |""".stripMargin)
-    }
 
-    test("build_sql") {
-        val sql = Source.fromResource("sql/select.access_log_with_where.sql").mkString("")
-        val dt = "20221031"
-        val buildSql = JdbcUtil.buildSql(sql, ("p_dt", dt)).split("\n").last.trim
-        assert(buildSql == s"where p_dt = '$dt'")
-    }
-
-    test("get_schema") {
         val desc = JdbcUtil.describe(container.jdbcUrl, dstTable)
-        println(desc)
-        println()
     }
 }
