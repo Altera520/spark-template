@@ -7,7 +7,7 @@ import java.sql.ResultSet
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.io.Source
-import scala.util.Using
+import scala.util.{Failure, Success, Using}
 
 
 object JdbcUtil {
@@ -58,14 +58,21 @@ object JdbcUtil {
      */
     def select[T](url: String, sql: String, bind: ResultSet => T): List[T] = {
         if (!dbcpPool.contains(url)) throw new NoSuchElementException
-        val beans = ListBuffer[T]()
+        //val beans = ListBuffer[T]()
         Using.Manager { use =>
             val conn = use(dbcpPool(url).getConnection)
             val pstmt = use(conn.prepareStatement(sql))
             val rs = use(pstmt.executeQuery())
-            while (rs.next()) beans += bind(rs)
+
+            new Iterator[T] {
+                def hasNext = rs.next()
+                def next(): T = bind(rs)
+            }.toList
+        } match {
+            case Success(value) => value
+            case Failure(exception) => throw exception
         }
-        beans.toList
+        //beans.toList
     }
 
     /**
